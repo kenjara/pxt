@@ -14,6 +14,7 @@ import * as compiler from "./compiler";
 
 import * as codecard from "./codecard"
 import * as gallery from "./gallery";
+import * as carousel from "./carousel";
 
 import Slider from 'react-slick';
 
@@ -22,7 +23,6 @@ type ISettingsProps = pxt.editor.ISettingsProps;
 import Cloud = pxt.Cloud;
 
 interface ProjectsProps extends ISettingsProps {
-    hasGettingStarted: boolean;
 }
 
 interface ProjectsState {
@@ -546,7 +546,7 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
             {this.hasFetchErrors ?
                 <p className="ui red inverted segment">{lf("Oops! There was an error. Please ensure you are connected to the Internet and try again.") }</p>
                 :
-                <Slider slickGoTo={slickGoTo} dots={false} infinite={false} slidesToShow={4} slidesToScroll={4} responsive={responsiveOptions}>
+                <carousel.Carousel>
                     {cards ? cards.map((scr, index) =>
                         <div key={path + scr.name}>
                             {expanded ? <div>{scr.name}</div> :
@@ -572,7 +572,7 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
                             url={scr.pubId && scr.pubCurrent ? "/" + scr.pubId : ""}
                             /></div>
                     ) }
-                </Slider>}
+                </carousel.Carousel>}
             {expanded ? <div className="expanded"></div> : undefined}
         </div>;
     }
