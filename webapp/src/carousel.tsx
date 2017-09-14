@@ -11,8 +11,8 @@ export interface ICarouselState {
 
 }
 
-const ANIMATION_MOVE_DIST = 8;
-const ANIMATION_DEBUFF_DIST = 9;
+const ANIMATION_MOVE_DIST = 30;
+const ANIMATION_DEBUFF_DIST = 31;
 const OUT_OF_BOUND_MARGIN = 20;
 
 export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
@@ -59,7 +59,7 @@ export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
     }
 
     public onArrowClick(left: boolean) {
-
+        this.setIndex(left ? this.index - this.actualPageLength : this.index + this.actualPageLength);
     }
 
     public componentDidMount() {
@@ -137,7 +137,7 @@ export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
 
     private dragEnd() {
         this.isDragging = false;
-        this.updateIndex();
+        this.calculateIndex();
     }
 
     private dragMove(x: number) {
@@ -155,22 +155,26 @@ export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
         }
     }
 
-    private updateIndex() {
+    private calculateIndex() {
         if (this.dragSurface) {
             const bucketIndex = Math.abs(Math.floor(this.currentOffset / (this.childWidth + this.childMargin)));
-
+            let index: number;
             if (this.currentOffset < this.dragStartOffset) {
-                this.index = bucketIndex;
+                index = bucketIndex;
             }
             else {
-                this.index = bucketIndex - 1;
+                index = bucketIndex - 1;
             }
 
-            this.index = Math.max(Math.min(this.index, this.childrenElements.length - this.props.pageLength), 0);
-
-            this.targetOffset = this.indexToOffset(this.index);
-            this.animationId = window.requestAnimationFrame(this.easeTowardsIndex.bind(this));
+            this.setIndex(index);
         }
+    }
+
+    private setIndex(index: number) {
+        this.index = Math.max(Math.min(index, this.childrenElements.length - this.props.pageLength), 0);
+
+        this.targetOffset = this.indexToOffset(this.index);
+        this.animationId = window.requestAnimationFrame(this.easeTowardsIndex.bind(this));
     }
 
     private easeTowardsIndex() {
