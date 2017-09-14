@@ -546,7 +546,7 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
             {this.hasFetchErrors ?
                 <p className="ui red inverted segment">{lf("Oops! There was an error. Please ensure you are connected to the Internet and try again.") }</p>
                 :
-                <carousel.Carousel>
+                <carousel.Carousel pageLength={4} bleedPercent={20}>
                     {cards ? cards.map((scr, index) =>
                         <div key={path + scr.name}>
                             {expanded ? <div>{scr.name}</div> :
