@@ -1,6 +1,5 @@
 /// <reference path="../../typings/globals/react/index.d.ts" />
 /// <reference path="../../typings/globals/react-dom/index.d.ts" />
-/// <reference path="../../localtypings/react-slick.d.ts" />
 /// <reference path="../../built/pxtlib.d.ts" />
 
 import * as React from "react";
@@ -16,13 +15,12 @@ import * as codecard from "./codecard"
 import * as gallery from "./gallery";
 import * as carousel from "./carousel";
 
-import Slider from 'react-slick';
-
 type ISettingsProps = pxt.editor.ISettingsProps;
 
 import Cloud = pxt.Cloud;
 
 interface ProjectsProps extends ISettingsProps {
+    hasGettingStarted: boolean;
 }
 
 interface ProjectsState {
@@ -514,19 +512,6 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
         this.carousel = $(this.node);
     }
 
-    getCarouselOptions() {
-        const isRTL = Util.isUserLanguageRtl();
-        const options: any = {
-            accessibility: true,
-            dots: true,
-            infinite: true,
-            speed: 500,
-            slidesToShow: 1,
-            slidesToScroll: 1
-        };
-        return options;
-    }
-
     newProject() {
         pxt.tickEvent("projects.carousel.new");
         this.props.hide();
@@ -555,47 +540,8 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
             } as any)
         }
 
-        const sliderSettings = this.getCarouselOptions();
-        const responsiveOptions = [
-            {
-                breakpoint: 1300,
-                settings: {
-                    slidesToShow: 4,
-                    slidesToScroll: 4,
-                    infinite: false
-                }
-            }, {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: false
-                }
-            }, {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 2,
-                    infinite: false
-                }
-            }, {
-                breakpoint: 300,
-                settings: "unslick" // destroys slick
-            }];
-
-        let sliding = false;
-        const beforeChange = () => {
-            sliding = true;
-        }
-
-        const afterChange = () => {
-            sliding = false;
-        }
-
         const onClick = (scr: any) => {
-            if (!sliding) {
-                this.props.onClick(scr);
-            }
+            this.props.onClick(scr);
         }
 
         return <div className="ui dimmable">

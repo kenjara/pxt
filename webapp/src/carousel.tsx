@@ -39,11 +39,11 @@ export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
 
     public render() {
         this.childrenElements = [];
-        return <div className="ui grid">
+        return <div className="ui grid middle aligned">
             <div className="carouselarrow one wide column" onClick={() => this.onArrowClick(true)}>
-                <i className="icon large circle arrow left"/>
+                <i className="icon large circle angle left"/>
             </div>
-            <div className="carouselcontainer twelve wide column" ref={r => this.container = r}>
+            <div className="carouselcontainer fourteen wide column" ref={r => this.container = r}>
                 <div className="carouselbody" ref={r => this.dragSurface = r}>
                 {
                     React.Children.map(this.props.children, child => <div className="carouselitem" ref={r => this.childrenElements.push(r)}>
@@ -52,8 +52,8 @@ export class Carousel extends React.Component<ICarouselProps, ICarouselState> {
                 }
                 </div>
             </div>
-            <div className="carouselarrow one wide column" onClick={() => this.onArrowClick(false)}>
-                <i className="icon large circle arrow right"/>
+            <div className="carouselarrow one wide column right aligned" onClick={() => this.onArrowClick(false)}>
+                <i className="icon large circle angle right"/>
             </div>
         </div>
     }
