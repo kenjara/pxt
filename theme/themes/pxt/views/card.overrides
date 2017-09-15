@@ -24,6 +24,12 @@
         margin-left: 4rem;
         min-width: 5rem;
         padding-left: 1.5rem;
+        height: 8rem;
+    }
+    .meta {
+        height: 4rem;
+        padding: 1rem;
+        text-align: right;
     }
 }
 
@@ -31,13 +37,13 @@
 .ui.card.newprojectcard {
     border-radius: 10px;
     background: fade(@primaryColor, 50%);
-    border: 2px dashed @solidBorderColor;
+    border: 2px solid @solidBorderColor;
     text-align: center;
     color: @white;
     font-size: 18pt;
 
     .content {
-        height: 200px;
+        height: 12rem;
     }
     .header {
         color: @white;
@@ -47,4 +53,29 @@
 }
 .ui.card.newprojectcard:hover {
     border: 2px solid @blue;
+}
+
+/* Example card */
+.ui.card.example {
+    .ui.image {
+        height: 8rem;
+    }
+    .content {
+        height: 4rem;
+    }
+}
+/* Hover animation on home screen cards */
+.ui.card.file:hover, .ui.card.newprojectcard:hover, .ui.card.example:hover {
+    transform: scale(1.1);
+}
+
+/* Project code cards */
+.ui.cardimage {
+    background-color: @secondaryColor;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 8rem;
+    border-top-left-radius: @defaultBorderRadius;
+    border-top-right-radius: @defaultBorderRadius;
 }

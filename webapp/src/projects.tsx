@@ -84,9 +84,8 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
         this.setState({ visible: true, tab: gals[0] || WELCOME });
     }
 
-    fetchGallery(tab: string, gallery: string | pxt.GalleryEntry): pxt.CodeCard[] {
+    fetchGallery(tab: string, path: string): pxt.CodeCard[] {
         if (this.state.tab != tab) return [];
-        const path = typeof gallery == "string" ? gallery as string : (gallery as pxt.GalleryEntry).path;
 
         let res = this.getData(`gallery:${encodeURIComponent(path)}`) as gallery.Gallery[];
         if (res) {
@@ -223,31 +222,10 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
             this.hide();
             this.props.parent.newProject();
         }
-        const renameProject = () => {
-            pxt.tickEvent("projects.rename");
-            this.hide();
-            this.props.parent.setFile(pkg.mainEditorPkg().files[pxt.CONFIG_NAME])
-        }
-        const resume = () => {
-            if (this.state.isInitialStartPage) {
-                chgHeader(this.state.resumeProject);
-            } else {
-                // The msot recent project is already loaded in the editor, so this is a no-op
-                this.hide();
-            }
-        }
         const gettingStarted = () => {
             pxt.tickEvent("projects.welcome.gettingstarted");
             this.hide();
             this.props.parent.gettingStarted();
-        }
-        const loadProject = () => {
-            pxt.tickEvent("projects.welcome.loadproject");
-            this.setState({ tab: MYSTUFF });
-        }
-        const projectGalleries = () => {
-            pxt.tickEvent("projects.welcome.galleries");
-            //this.setState({ tab: galleryNames[0] })
         }
 
         const seeAll = (gal: string) => {
@@ -305,9 +283,9 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
                         <div className="left menu">
                             <span className="ui item logo brand">
                                 {targetTheme.logo || targetTheme.portraitLogo
-                                    ? <a className="ui image landscape only" target="_blank" rel="noopener" href={targetTheme.logoUrl}><img className={`ui logo ${targetTheme.portraitLogo ? " portrait hide" : ''}`} src={Util.toDataUri(targetTheme.logo || targetTheme.portraitLogo)} alt={`${targetTheme.boardName} Logo`} /></a>
+                                    ? <a className="ui image landscape only" target="_blank" rel="noopener" href={targetTheme.logoUrl}><img className={`ui logo ${targetTheme.portraitLogo ? " portrait hide" : ''}`} src={Util.toDataUri(targetTheme.logo || targetTheme.portraitLogo) } alt={`${targetTheme.boardName} Logo`} /></a>
                                     : <span className="name">{targetTheme.name}</span>}
-                                {targetTheme.portraitLogo ? (<a className="ui portrait only" target="_blank" rel="noopener" href={targetTheme.logoUrl}><img className='ui mini image portrait only' src={Util.toDataUri(targetTheme.portraitLogo)} alt={`${targetTheme.boardName} Logo`} /></a>) : null}
+                                {targetTheme.portraitLogo ? (<a className="ui portrait only" target="_blank" rel="noopener" href={targetTheme.logoUrl}><img className='ui mini image portrait only' src={Util.toDataUri(targetTheme.portraitLogo) } alt={`${targetTheme.boardName} Logo`} /></a>) : null}
                             </span>
                         </div>
                         <div className="ui item">{tabIcon ? <i className={`icon ${tabIcon}`} aria-hidden={true}/> : undefined} {tabName}</div>
@@ -347,7 +325,7 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
                             </div>
                         </div>
                         <div className="content">
-                            <ProjectsCarousel key={`${MYSTUFF}_carousel`} parent={this.props.parent} name={'recent'} hide={() => this.hide() }/>
+                            <ProjectsCarousel key={`${MYSTUFF}_carousel`} parent={this.props.parent} name={'recent'} hide={() => this.hide() } onClick={(scr: any) => chgHeader(scr) }/>
                         </div>
                     </div>
                     {Object.keys(galleries).map(galleryName =>
@@ -360,7 +338,7 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
                                     </div>
                                 </div>
                                 <div className="content">
-                                    <ProjectsCarousel  key={`${galleryName}_carousel`} parent={this.props.parent} name={galleryName} galleryEntry={galleries[galleryName]} hide={() => this.hide() }/>
+                                    <ProjectsCarousel  key={`${galleryName}_carousel`} parent={this.props.parent} name={galleryName} path={galleries[galleryName]} hide={() => this.hide() } onClick={(scr: any) => chgGallery(scr) }/>
                                 </div>
                             </div>
                         </div>
@@ -480,9 +458,10 @@ export class Projects extends data.Component<ProjectsProps, ProjectsState> {
 
 interface ProjectsCarouselProps extends ISettingsProps {
     name: string;
-    galleryEntry?: string | pxt.GalleryEntry;
+    path?: string;
     cardWidth?: number;
     hide: Function;
+    onClick: Function;
 }
 
 interface ProjectsCarouselState {
@@ -559,13 +538,8 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
     }
 
     renderCore() {
-        const {name, galleryEntry} = this.props;
+        const {name, path} = this.props;
         const theme = pxt.appTarget.appTheme;
-        const isGallery = galleryEntry && !(typeof galleryEntry == "string");
-        const path = isGallery ? (galleryEntry as pxt.GalleryEntry).path : (galleryEntry as string);
-        const hoverIcon = isGallery ? (galleryEntry as pxt.GalleryEntry).hoverIcon : '';
-        const hoverButton = isGallery ? (galleryEntry as pxt.GalleryEntry).hoverButton : '';
-        const hoverButtonClass = isGallery ? (galleryEntry as pxt.GalleryEntry).hoverButtonClass : '';
 
         // Fetch the gallery
         this.hasFetchErrors = false;
@@ -579,14 +553,6 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
                 id: 'new',
                 name: lf("New Project")
             } as any)
-        }
-
-        const chgGallery = (src: any) => {
-            console.log(src);
-        }
-
-        const chgHeader = (src: any) => {
-            console.log(src);
         }
 
         const sliderSettings = this.getCarouselOptions();
@@ -617,6 +583,21 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
                 settings: "unslick" // destroys slick
             }];
 
+        let sliding = false;
+        const beforeChange = () => {
+            sliding = true;
+        }
+
+        const afterChange = () => {
+            sliding = false;
+        }
+
+        const onClick = (scr: any) => {
+            if (!sliding) {
+                this.props.onClick(scr);
+            }
+        }
+
         return <div className="ui dimmable">
             {this.hasFetchErrors ?
                 <p className="ui red inverted segment">{lf("Oops! There was an error. Please ensure you are connected to the Internet and try again.") }</p>
@@ -625,20 +606,19 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
                     {cards ? cards.map((scr, index) =>
                         <div key={path + scr.name}>
                             <codecard.CodeCardView
+                                className="example"
+                                key={'gallery' + scr.name}
                                 name={scr.name}
                                 url={scr.url}
                                 imageUrl={scr.imageUrl}
                                 youTubeId={scr.youTubeId}
-                                hoverIcon={hoverIcon}
-                                hoverButton={hoverButton}
-                                hoverButtonClass={hoverButtonClass}
-                                onClick={() => this.showDetails(index, scr) }
+                                onClick={() => onClick(scr) }
                                 />
                         </div>
-                    ) : headers.slice(0, 10).map((scr, index) =>
+                    ) : headers.map((scr, index) =>
                         <div>
                             {scr.id == 'new' ?
-                                <div className="ui card newprojectcard" onClick={() => this.newProject() }>
+                                <div className="ui card newprojectcard" tabIndex={1} title={lf("Creates a new empty project") } onClick={() => this.newProject() }>
                                     <div className="content">
                                         <i className="icon huge add circle"></i>
                                         <span className="header">{scr.name}</span>
@@ -652,7 +632,7 @@ export class ProjectsCarousel extends data.Component<ProjectsCarouselProps, Proj
                                     name={scr.name}
                                     time={scr.recentUse}
                                     url={scr.pubId && scr.pubCurrent ? "/" + scr.pubId : ""}
-                                    onClick={() => this.showDetails(index, scr) }
+                                    onClick={() => onClick(scr) }
                                     />
                             }
                         </div>

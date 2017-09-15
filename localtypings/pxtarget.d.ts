@@ -179,7 +179,7 @@ declare namespace pxt {
         simAnimationEnter?: string; // Simulator enter animation
         simAnimationExit?: string; // Simulator exit animation
         hasAudio?: boolean; // target uses the Audio manager. if true: a mute button is added to the simulator toolbar.
-        galleries?: pxt.Map<string|GalleryEntry>; // list of galleries to display in projects dialog
+        galleries?: pxt.Map<string>; // list of galleries to display in projects dialog
         crowdinProject?: string;
         crowdinBranch?: string; // optional branch specification for pxt
         monacoToolbox?: boolean; // if true: show the monaco toolbox when in the monaco editor
@@ -208,18 +208,11 @@ declare namespace pxt {
         blockColors?: Map<string>; // block namespace colors, used for build in categories
         blocklyColors?: Blockly.Colours; // Blockly workspace, flyout and other colors
         socialOptions?: SocialOptions; // show social icons in share dialog, options like twitter handle and org handle
-        skipHomeScreen?: boolean; // hide the home page on editor load and go straight to the editor view, loading the previous project
+        showHomeScreen?: boolean; // show the home page on editor load
         noReloadOnUpdate?: boolean; // do not notify the user or reload the page when a new app cache is downloaded
         appPathNames?: string[]; // Authorized URL paths in electron or UWP, all other paths will display a warning banner
         defaultBlockGap?: number; // For targets to override block gap
         hideShareEmbed?: boolean; // don't show advanced embedding options in share dialog
-    }
-
-    interface GalleryEntry {
-        path: string;
-        hoverIcon?: string;
-        hoverButton?: string;
-        hoverButtonClass?: string;
     }
 
     interface SocialOptions {

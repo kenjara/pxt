@@ -9,7 +9,10 @@
     background: none;
     border: none;
     box-shadow: none;
-    padding: 1rem;
+    padding: 2rem;
+    margin-top: -1rem;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
 }
 
 /* Carousel */
@@ -40,16 +43,18 @@
         margin: 0;
         width: 100%;
         min-height: 100%;
+        background: @homeScreenBackground;
     }
 
     .gallerysegment {
         .header {
             font-size: 24px;
+            color: @green;
         }
-        .meta {
-            padding: 1rem;
-            text-align: right;
-        }
+    }
+    .ui.divider {
+        margin-left: 2rem;
+        margin-right: 2rem;
     }
 
     /* Footer, Privary, Terms of Use */
